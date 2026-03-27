@@ -24,11 +24,16 @@ def fetch_ticker(
     if os.path.exists(path) and not force_refresh:
         return pd.read_parquet(path)
 
-    df = yf.download(ticker, start=start, end=end, auto_adjust=True, progress=False)
+    df = yf.download(ticker, start=start, end=end, auto_adjust=True, progress=False,
+                     multi_level_index=False)
     if df.empty:
         raise ValueError(f"No data returned for {ticker}")
 
-    df.columns = [c.lower() for c in df.columns]
+    # Flatten MultiIndex columns if present (newer yfinance versions)
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = [c[0].lower() for c in df.columns]
+    else:
+        df.columns = [c.lower() for c in df.columns]
     df.index.name = "date"
     df["ticker"] = ticker
     df.to_parquet(path)

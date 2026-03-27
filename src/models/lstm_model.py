@@ -87,6 +87,10 @@ class LSTMForecaster:
         from tensorflow import keras
         from sklearn.preprocessing import RobustScaler
 
+        # Replace inf/nan with 0 before scaling
+        X_train = np.where(np.isfinite(X_train), X_train, 0.0)
+        X_val = np.where(np.isfinite(X_val), X_val, 0.0)
+
         # Scale features
         self.scaler = RobustScaler()
         X_train_s = self.scaler.fit_transform(X_train)
@@ -121,11 +125,12 @@ class LSTMForecaster:
         """Predict on raw (unscaled) feature array; returns predictions."""
         if self.model is None or self.scaler is None:
             raise RuntimeError("Model not fitted. Call fit() first.")
+        X = np.where(np.isfinite(X), X, 0.0)
         X_s = self.scaler.transform(X)
         # Need at least lookback rows; return NaN for insufficient history
         if len(X_s) < self.lookback:
             return np.full(len(X_s), np.nan)
-        X_seq = np.array([X_s[i - self.lookback: i] for i in range(self.lookback, len(X_s) + 1)])
+        X_seq = np.array([X_s[i - self.lookback: i] for i in range(self.lookback, len(X_s))])
         raw_preds = self.model.predict(X_seq, verbose=0).flatten()
         # Align with original index: first lookback rows get NaN
         result = np.full(len(X), np.nan)

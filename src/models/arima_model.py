@@ -30,6 +30,7 @@ class RegimeAwareARIMA:
         regimes = df.loc[returns.index, regime_col]
 
         for regime in sorted(regimes.unique()):
+            regime = int(regime)
             mask = regimes == regime
             regime_returns = returns[mask]
 
@@ -86,8 +87,9 @@ class RegimeAwareARIMA:
 
         for regime in sorted(regimes.unique()):
             mask = regimes == regime
-            forecast = self.predict(regime, steps=1)
-            preds[mask] = forecast[0]
+            idx = mask.index[mask]
+            forecast = self.predict(int(regime), steps=1)
+            preds.loc[idx] = float(np.asarray(forecast).flat[0])
 
         return preds
 
