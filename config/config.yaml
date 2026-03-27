@@ -1,0 +1,67 @@
+tickers:
+  - AAPL
+  - MSFT
+  - SPY
+  - QQQ
+
+data:
+  start_date: "2018-01-01"
+  end_date: "2024-12-31"
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+
+features:
+  lookback_short: 10
+  lookback_medium: 20
+  lookback_long: 30
+  rsi_period: 14
+  atr_period: 14
+  stochastic_period: 14
+  macd_fast: 12
+  macd_slow: 26
+  macd_signal: 9
+  bollinger_window: 20
+  bollinger_std: 2
+
+regime:
+  n_components: 2          # HMM states: 0=low-vol, 1=high-vol
+  n_iter: 200
+  covariance_type: "full"
+
+arima:
+  max_p: 5
+  max_q: 5
+  max_d: 2
+  seasonal: false
+  information_criterion: "aic"
+  arch_lm_significance: 0.05
+
+lstm:
+  lookback_window: 60
+  units_layer1: 128
+  units_layer2: 64
+  dense_units: 32
+  dropout: 0.2
+  recurrent_dropout: 0.1
+  batch_size: 64
+  max_epochs: 100
+  patience: 15
+  lr_reduce_patience: 7
+  lr_reduce_factor: 0.5
+  clip_norm: 1.0
+
+walk_forward:
+  initial_train_size: 504   # ~2 years of trading days
+  step_size: 21             # monthly re-fit
+  val_size: 63              # 3-month validation window
+  expanding_window: true
+
+signals:
+  buy_threshold: 0.005      # predicted return > +0.5%
+  sell_threshold: -0.005    # predicted return < -0.5%
+
+dashboard:
+  host: "0.0.0.0"
+  port: 8050
+  debug: false
+  cache_timeout: 300        # seconds
