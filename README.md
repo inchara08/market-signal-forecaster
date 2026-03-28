@@ -41,20 +41,20 @@ yfinance API
 ┌─────────────────────────────────────────────────────┐
 │              Feature Engineering (24+ features)     │
 │  returns.py · volatility.py · technical.py          │
-│  statistical.py                                      │
-│                                                      │
-│  Returns: log_return, rolling_return_5/20d, ...      │
-│  Volatility: realized_vol, Parkinson, GARCH, ...     │
-│  Technical: RSI, MACD, Bollinger, ATR, Stochastic    │
-│  Statistical: Hurst, entropy, autocorr, skew, ...    │
+│  statistical.py                                     │
+│                                                     │
+│  Returns: log_return, rolling_return_5/20d, ...     │
+│  Volatility: realized_vol, Parkinson, GARCH, ...    │
+│  Technical: RSI, MACD, Bollinger, ATR, Stochastic   │
+│  Statistical: Hurst, entropy, autocorr, skew, ...   │
 └────────────────────┬────────────────────────────────┘
                      │
          ┌───────────┴───────────┐
          ▼                       ▼
 ┌────────────────┐     ┌─────────────────────┐
-│  ARIMA/GARCH   │     │    LSTM Forecaster   │
-│  per regime    │     │  (128→64→Dense)      │
-│  (HMM labels)  │     │  Huber loss          │
+│  ARIMA/GARCH   │     │    LSTM Forecaster  │
+│  per regime    │     │  (128→64→Dense)     │
+│  (HMM labels)  │     │  Huber loss         │
 └───────┬────────┘     └──────────┬──────────┘
         └─────────────┬───────────┘
                       ▼
