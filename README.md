@@ -2,6 +2,31 @@
 
 End-to-end market trend forecasting and signal modeling pipeline built with Python. Detects volatility regimes, engineers 24+ statistical features, and generates buy/sell signals via ARIMA/GARCH and LSTM models — all surfaced through an interactive Plotly Dash dashboard.
 
+## Results (AAPL 2018–2024, 15-fold Walk-Forward CV)
+
+| Model | Directional Accuracy | MAPE Improvement vs Baseline | IC |
+|---|---|---|---|
+| Ensemble | 54.5% | 59.6% | +0.04 |
+| LSTM | 54.6% | 48.2% | +0.07 |
+| ARIMA | 49.8% | 63.9% | -0.06 |
+
+### Volatility Regime Detection
+HMM-detected low-volatility (green) and high-volatility (red) regimes overlaid on AAPL price.
+
+![Regime Overlay](results/images/regime_overlay.png)
+
+### Walk-Forward Validation Metrics
+Directional accuracy and MAPE improvement across all 15 out-of-sample folds.
+
+![CV Metrics](results/images/cv_metrics.png)
+
+### Cumulative Returns: Ensemble Strategy vs Buy & Hold
+Signal-driven long/short strategy (**2.07×**) vs. buy-and-hold (**1.52×**) over the validation periods.
+
+![P&L](results/images/cumulative_pnl.png)
+
+---
+
 ## Architecture
 
 ```
