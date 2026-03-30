@@ -6,7 +6,7 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 
-REGIME_COLORS = {0: "rgba(39,174,96,0.25)", 1: "rgba(231,76,60,0.25)"}
+REGIME_COLORS = {0: "rgba(39,174,96,0.12)", 1: "rgba(231,76,60,0.12)"}
 REGIME_LABELS = {0: "Low Volatility", 1: "High Volatility"}
 
 
@@ -15,8 +15,8 @@ def build_price_chart(df: pd.DataFrame, ticker: str) -> go.Figure:
     fig = make_subplots(
         rows=2, cols=1,
         shared_xaxes=True,
-        row_heights=[0.75, 0.25],
-        vertical_spacing=0.03,
+        row_heights=[0.7, 0.3],
+        vertical_spacing=0.05,
     )
 
     # Candlestick
@@ -53,11 +53,13 @@ def build_price_chart(df: pd.DataFrame, ticker: str) -> go.Figure:
         _add_regime_shading(fig, df, row=1)
 
     # Volume bars
-    colors = ["#27ae60" if r >= 0 else "#e74c3c"
-              for r in df["close"].pct_change().fillna(0)]
+    ret = df["close"].pct_change().fillna(0).values
+    colors = ["#26a69a" if r >= 0 else "#ef5350" for r in ret]
     fig.add_trace(go.Bar(
-        x=df.index, y=df["volume"], name="Volume",
-        marker_color=colors, showlegend=False,
+        x=list(df.index), y=df["volume"].tolist(),
+        name="Volume",
+        marker=dict(color=colors, opacity=0.8),
+        showlegend=False,
     ), row=2, col=1)
 
     fig.update_layout(
@@ -74,20 +76,25 @@ def build_price_chart(df: pd.DataFrame, ticker: str) -> go.Figure:
 
 
 def _add_regime_shading(fig: go.Figure, df: pd.DataFrame, row: int = 1) -> None:
-    """Add colored background rectangles for each regime period."""
+    """Add colored background shapes for each regime period (price subplot only)."""
     if "volatility_regime" not in df.columns:
         return
     regime = df["volatility_regime"]
     prev_val = regime.iloc[0]
     start = df.index[0]
 
+    # yref="y domain" limits the shape to the price subplot's y-axis extent only
+    yref = "y domain" if row == 1 else f"y{row} domain"
+
     for i in range(1, len(regime)):
         if regime.iloc[i] != prev_val or i == len(regime) - 1:
-            fig.add_vrect(
+            fig.add_shape(
+                type="rect",
                 x0=start, x1=df.index[i],
+                y0=0, y1=1,
+                xref="x", yref=yref,
                 fillcolor=REGIME_COLORS.get(prev_val, "rgba(0,0,0,0)"),
                 layer="below", line_width=0,
-                row=row, col=1,
             )
             start = df.index[i]
             prev_val = regime.iloc[i]
